@@ -1,69 +1,9 @@
-const quizData = [
-  {
-    question: "Webページの「構造や骨組み」を定義する言語はどれ？",
-    options: ["HTML", "CSS", "JavaScript"],
-    answer: 0,
-    explanation: "HTMLはWebページの構造を記述するための言語です。"
-  },
-  {
-    question: "Webページの「見た目やデザイン」を設定する言語はどれ？",
-    options: ["HTML", "CSS", "JavaScript"],
-    answer: 1,
-    explanation: "CSSは色、配置、フォントなどのスタイルを定義します。"
-  },
-  {
-    question: "Webページに「動的な動きや処理」を追加する言語はどれ？",
-    options: ["HTML", "CSS", "JavaScript"],
-    answer: 2,
-    explanation: "JavaScriptを使用することで、クリック時の処理やデータのやり取りなどの動きを実装できます。"
-  },
-  {
-    question: "プログラムの変更履歴を記録・管理するための分散型バージョン管理システムはどれ？",
-    options: ["GitHub", "Git", "Cloudflare"],
-    answer: 1,
-    explanation: "Gitはローカルやリモートでコードの変更履歴を管理するツール本体です。"
-  },
-  {
-    question: "Gitで管理しているコードをクラウド上で保存・共有できるプラットフォームはどれ？",
-    options: ["GitHub", "VS Code", "Cloudflare Pages"],
-    answer: 0,
-    explanation: "GitHubはGitリポジトリをオンラインでホスティング・管理するサービスです。"
-  },
-  {
-    question: "GitHubと連携して、静的Webサイトを高速に世界へ配信できるホスティングサービスはどれ？",
-    options: ["Cloudflare Pages", "Docker", "Node.js"],
-    answer: 0,
-    explanation: "Cloudflare PagesはGitHubリポジトリから自動でWebサイトをデプロイ・公開できます。"
-  },
-  {
-    question: "HTMLファイル内で外部CSSファイルを読み込む際に使うタグはどれ？",
-    options: ["<script>", "<style>", "<link>"],
-    answer: 2,
-    explanation: "<link rel=\"stylesheet\" href=\"style.css\"> のようにして読み込みます。"
-  },
-  {
-    question: "HTMLファイル内で外部JavaScriptファイルを読み込む際に使うタグはどれ？",
-    options: ["<script>", "<js>", "<link>"],
-    answer: 0,
-    explanation: "<script src=\"script.js\"></script> のように指定します。"
-  },
-  {
-    question: "ブラウザ上でエラー確認や変数の値チェック（console.logなど）を行うためのツールはどれ？",
-    options: ["デベロッパーツール（開発者ツール）", "ターミナル", "Cloudflare Dashboard"],
-    answer: 0,
-    explanation: "ブラウザでF12キーや右クリック「検証」から開けるデベロッパーツールを使います。"
-  },
-  {
-    question: "Webサイトのトップページとしてブラウザが自動的に参照する標準的なファイル名はどれ？",
-    options: ["main.html", "index.html", "home.html"],
-    answer: 1,
-    explanation: "Webサーバーはデフォルトで `index.html` を一番最初に読み込みます。"
-  }
-];
-
+let allQuizData = []; // 全20問を保持する配列
+let quizData = [];    // ランダム選出された5問を保持する配列
 let currentQuestion = 0;
 let score = 0;
 
+// DOM要素の取得
 const questionEl = document.getElementById("question");
 const optionsEl = document.getElementById("options");
 const explanationEl = document.getElementById("explanation");
@@ -73,6 +13,32 @@ const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
 const scoreEl = document.getElementById("score");
 
+// JSONファイルから問題データを取得し、ランダムに5問抽出する関数
+async function fetchQuizData() {
+  try {
+    const response = await fetch("quiz-data.json");
+    if (!response.ok) {
+      throw new Error("データの取得に失敗しました");
+    }
+    allQuizData = await response.json();
+    
+    // 配列をシャッフルして先頭5問を抽出
+    quizData = getRandomQuestions(allQuizData, 5);
+    
+    loadQuiz();
+  } catch (error) {
+    console.error("エラー:", error);
+    questionEl.textContent = "問題データの読み込みに失敗しました。";
+  }
+}
+
+// 配列をシャッフルして指定した個数を取得するユーティリティ関数
+function getRandomQuestions(array, count) {
+  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
+// 1問分の問題・選択肢を表示
 function loadQuiz() {
   const current = quizData[currentQuestion];
   progressEl.textContent = `問題 ${currentQuestion + 1} / ${quizData.length}`;
@@ -90,6 +56,7 @@ function loadQuiz() {
   });
 }
 
+// 選択肢をクリックした際の正誤判定処理
 function selectOption(selectedIndex) {
   const current = quizData[currentQuestion];
   const buttons = optionsEl.querySelectorAll(".option-btn");
@@ -113,6 +80,7 @@ function selectOption(selectedIndex) {
   nextBtn.style.display = "block";
 }
 
+// 「次の問題へ」ボタンのイベント
 nextBtn.addEventListener("click", () => {
   currentQuestion++;
   if (currentQuestion < quizData.length) {
@@ -122,10 +90,12 @@ nextBtn.addEventListener("click", () => {
   }
 });
 
+// 結果画面の表示
 function showResult() {
   quizScreen.style.display = "none";
   resultScreen.style.display = "block";
-  scoreEl.textContent = `10問中 ${score} 問正解でした！`;
+  scoreEl.textContent = `${quizData.length}問中 ${score} 問正解でした！`;
 }
 
-loadQuiz();
+// アプリの初期化実行
+fetchQuizData();
