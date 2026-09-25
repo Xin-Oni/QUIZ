@@ -12,6 +12,7 @@ const progressEl = document.getElementById("progress");
 const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
 const scoreEl = document.getElementById("score");
+const highScoreEl = document.getElementById("high-score");
 
 // JSONファイルから問題データを取得し、ランダムに5問抽出する関数
 async function fetchQuizData() {
@@ -21,10 +22,10 @@ async function fetchQuizData() {
       throw new Error("データの取得に失敗しました");
     }
     allQuizData = await response.json();
-    
+
     // 配列をシャッフルして先頭5問を抽出
     quizData = getRandomQuestions(allQuizData, 5);
-    
+
     loadQuiz();
   } catch (error) {
     console.error("エラー:", error);
@@ -95,6 +96,17 @@ function showResult() {
   quizScreen.style.display = "none";
   resultScreen.style.display = "block";
   scoreEl.textContent = `${quizData.length}問中 ${score} 問正解でした！`;
+
+  // 1. 保存されている最高スコアを取得（まだ無ければ 0 とする）
+  const savedHighScore = localStorage.getItem("quizHighScore") || 0;
+
+  // 2. 今回のスコアが最高スコアを超えていたら更新して保存
+  if (score > Number(savedHighScore)) {
+    localStorage.setItem("quizHighScore", score);
+    highScoreEl.textContent = `🎉 最高記録更新！ 最高スコア: ${score} / ${quizData.length}`;
+  } else {
+    highScoreEl.textContent = `最高スコア: ${savedHighScore} / ${quizData.length}`;
+  }
 }
 
 // アプリの初期化実行

@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webアプリ開発 基礎知識クイズ</title>
   <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script> 
+  <script src="script.js" defer></script>
 </head>
+
 <body>
   <div class="quiz-container">
     <h1>Web開発 基礎クイズ</h1>
-    
+
     <div id="quiz-screen">
       <div class="progress" id="progress">問題 1 / 10</div>
       <div class="question" id="question">問題を読み込み中...</div>
@@ -22,10 +24,11 @@
     <div id="result-screen" style="display: none;">
       <h2>結果発表</h2>
       <p class="score" id="score"></p>
+      <!-- ↓ 追加：最高スコアを表示するエリア -->
+      <p class="high-score" id="high-score"></p>
       <button onclick="location.reload()" class="restart-btn">もう一度挑戦する</button>
     </div>
   </div>
-
-
 </body>
+
 </html>
