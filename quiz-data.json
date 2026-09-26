@@ -118,5 +118,65 @@
     "options": ["Supabase", "VS Code", "Vite"],
     "answer": 0,
     "explanation": "SupabaseやFirebaseは、バックエンド処理やDBを簡単に扱えるサービスです。"
+  },
+  {
+    "question": "JavaScriptで外部ファイルやAPIからデータを非同期で取得するための標準関数はどれ？",
+    "options": ["fetch()", "get()", "request()"],
+    "answer": 0,
+    "explanation": "fetch() を使用することで、ページ全体をリロードせずに外部のJSONファイルなどのデータを取得できます。"
+  },
+  {
+    "question": "非同期処理の完了を待機し、コードを上から順に実行させるために await とセットで使うキーワードはどれ？",
+    "options": ["defer", "async", "sync"],
+    "answer": 1,
+    "explanation": "async を付与した関数内でのみ await キーワードを使用して非同期処理の完了を待つことができます。"
+  },
+  {
+    "question": "ブラウザを閉じてもデータが保持され、最高スコアの保存などに使われるWeb Storage機能はどれ？",
+    "options": ["sessionStorage", "localStorage", "Cookie"],
+    "answer": 1,
+    "explanation": "localStorageは明示的に削除しない限り、ブラウザ内に半永久的にデータを保持できます。"
+  },
+  {
+    "question": "JavaScriptで1秒（1000ミリ秒）ごとに特定の処理を繰り返し実行させたい場合に使う関数はどれ？",
+    "options": ["setTimeout()", "setInterval()", "clearInterval()"],
+    "answer": 1,
+    "explanation": "setInterval(関数, 1000) と記述することで、1秒ごとに指定した処理を繰り返し実行できます。"
+  },
+  {
+    "question": "setInterval() で開始したタイマー処理を途中で停止させるために使用する関数はどれ？",
+    "options": ["stopInterval()", "clearTimeout()", "clearInterval()"],
+    "answer": 2,
+    "explanation": "clearInterval(タイマーID) を実行することで、動作中の繰り返し処理を停止できます。"
+  },
+  {
+    "question": "HTML・CSS・JSのみで構成され外部通信がないアプリを、PCのブラウザで直接ファイル（file:///）を開いて実行できる理由はどれ？",
+    "options": [
+      "外部とのファイル読み込み通信が発生せず、セキュリティ制限を受けないため",
+      "ブラウザが自動的にクラウドサーバーへ接続してくれるため",
+      "JavaScriptが常に暗号化されて実行されるため"
+    ],
+    "answer": 0,
+    "explanation": "外部データの取得処理がない単一のファイル構造であれば、Webサーバーを経由しなくてもローカルのブラウザでそのまま動作します。"
+  },
+  {
+    "question": "fetch() を使ってローカルの外部ファイル（quiz-data.jsonなど）を直接開こうとした際、ブラウザのセキュリティ制限でエラーになる理由はどれ？",
+    "options": [
+      "file:/// プロトコルでの通信は安全性が確認できず、ブラウザのセキュリティ（CORS）でブロックされるため",
+      "JavaScriptがJSONファイルを認識できない仕様になっているため",
+      "JSONファイルを開くには常にパスワードが必要となるため"
+    ],
+    "answer": 0,
+    "explanation": "ブラウザはセキュリティ上、ローカルファイル（file:///）からの外部通信を危険と判断してブロックするため、Webサーバー環境が必要です。"
+  },
+  {
+    "question": "PCローカル環境で fetch() を使うコードをエラーなく動作・テストするために使うツールはどれ？",
+    "options": [
+      "VS Code の「Live Server」拡張機能（ローカルWebサーバー）",
+      "Google Chrome の「シークレットモード」",
+      "Windows の「コマンドプロンプト」"
+    ],
+    "answer": 0,
+    "explanation": "Live Server などを利用して擬似的なWebサーバー環境（http://...）を立ち上げることで、ローカルでも fetch 通信が正常に動くようになります。"
   }
 ]
