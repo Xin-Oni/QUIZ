@@ -1,26 +1,26 @@
-let allQuizData = [];
-let quizData = [];
+let allQuizData = []; 
+let quizData = [];    
 let currentQuestion = 0;
 let score = 0;
 
-// タイマー制御用の変数
 let timerId = null;
-const TIME_LIMIT = 10; // 1問あたりの制限時間（秒）
+const TIME_LIMIT = 10;
 let timeLeft = TIME_LIMIT;
 
-// DOM要素の取得
+// DOM要素
+const startScreen = document.getElementById("start-screen");
+const quizScreen = document.getElementById("quiz-screen");
+const resultScreen = document.getElementById("result-screen");
 const questionEl = document.getElementById("question");
 const optionsEl = document.getElementById("options");
 const explanationEl = document.getElementById("explanation");
 const nextBtn = document.getElementById("next-btn");
 const progressEl = document.getElementById("progress");
-const quizScreen = document.getElementById("quiz-screen");
-const resultScreen = document.getElementById("result-screen");
 const scoreEl = document.getElementById("score");
 const highScoreEl = document.getElementById("high-score");
-const timerEl = document.getElementById("timer"); // 追加
+const timerEl = document.getElementById("timer");
 
-// JSONファイルから問題データを取得し、ランダムに5問抽出する関数
+// 初回に全データを取得
 async function fetchQuizData() {
   try {
     const response = await fetch("quiz-data.json");
@@ -28,33 +28,55 @@ async function fetchQuizData() {
       throw new Error("データの取得に失敗しました");
     }
     allQuizData = await response.json();
-    quizData = getRandomQuestions(allQuizData, 5);
-    loadQuiz();
   } catch (error) {
     console.error("エラー:", error);
-    questionEl.textContent = "問題データの読み込みに失敗しました。";
+    alert("問題データの読み込みに失敗しました。");
   }
 }
 
-// 配列をシャッフルして指定した個数を取得するユーティリティ関数
+// カテゴリ選択後にクイズを開始する関数
+function startQuiz(selectedCategory) {
+  let filteredData = [];
+
+  if (selectedCategory === "all") {
+    filteredData = allQuizData;
+  } else {
+    // 【重要】選ばれたカテゴリに一致する問題だけを抽出
+    filteredData = allQuizData.filter(q => q.category === selectedCategory);
+  }
+
+  if (filteredData.length === 0) {
+    alert("該当するカテゴリの問題がありません。");
+    return;
+  }
+
+  // シャッフルして抽出（最大3問または5問）
+  quizData = getRandomQuestions(filteredData, Math.min(filteredData.length, 5));
+  
+  // 画面の切り替え
+  startScreen.style.display = "none";
+  quizScreen.style.display = "block";
+
+  // 変数の初期化と最初の問題読み込み
+  currentQuestion = 0;
+  score = 0;
+  loadQuiz();
+}
+
 function getRandomQuestions(array, count) {
   const shuffled = [...array].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
 
-// タイマーを開始する関数
 function startTimer() {
-  // 既存のタイマーがあればリセット
   clearInterval(timerId);
   timeLeft = TIME_LIMIT;
   timerEl.textContent = `残り時間: ${timeLeft}秒`;
 
-  // 1秒（1000ミリ秒）ごとに処理を実行
   timerId = setInterval(() => {
     timeLeft--;
     timerEl.textContent = `残り時間: ${timeLeft}秒`;
 
-    // 時間切れ時の処理
     if (timeLeft <= 0) {
       clearInterval(timerId);
       handleTimeOut();
@@ -62,12 +84,10 @@ function startTimer() {
   }, 1000);
 }
 
-// タイマーをストップする関数
 function stopTimer() {
   clearInterval(timerId);
 }
 
-// 1問分の問題・選択肢を表示
 function loadQuiz() {
   const current = quizData[currentQuestion];
   progressEl.textContent = `問題 ${currentQuestion + 1} / ${quizData.length}`;
@@ -84,13 +104,11 @@ function loadQuiz() {
     optionsEl.appendChild(button);
   });
 
-  // 問題が表示されたらタイマー開始
   startTimer();
 }
 
-// 選択肢をクリックした際の正誤判定処理
 function selectOption(selectedIndex) {
-  stopTimer(); // 回答したらタイマー停止
+  stopTimer();
 
   const current = quizData[currentQuestion];
   const buttons = optionsEl.querySelectorAll(".option-btn");
@@ -114,7 +132,6 @@ function selectOption(selectedIndex) {
   nextBtn.style.display = "block";
 }
 
-// 制限時間切れ（タイムオーバー）時の処理
 function handleTimeOut() {
   const current = quizData[currentQuestion];
   const buttons = optionsEl.querySelectorAll(".option-btn");
@@ -122,7 +139,7 @@ function handleTimeOut() {
   buttons.forEach((button, index) => {
     button.disabled = true;
     if (index === current.answer) {
-      button.classList.add("correct"); // 正解だけ緑色で表示
+      button.classList.add("correct");
     }
   });
 
@@ -131,7 +148,6 @@ function handleTimeOut() {
   nextBtn.style.display = "block";
 }
 
-// 「次の問題へ」ボタンのイベント
 nextBtn.addEventListener("click", () => {
   currentQuestion++;
   if (currentQuestion < quizData.length) {
@@ -141,7 +157,6 @@ nextBtn.addEventListener("click", () => {
   }
 });
 
-// 結果画面の表示
 function showResult() {
   stopTimer();
   quizScreen.style.display = "none";
@@ -158,5 +173,5 @@ function showResult() {
   }
 }
 
-// アプリの初期化実行
+// アプリの起動時にデータだけ先読み
 fetchQuizData();

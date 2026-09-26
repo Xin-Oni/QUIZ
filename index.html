@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webアプリ開発 基礎知識クイズ</title>
   <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+  <script src="script.js" defer></script> 
 </head>
-
 <body>
   <div class="quiz-container">
     <h1>Web開発 基礎クイズ</h1>
 
-    <div id="quiz-screen">
-      <div class="progress" id="progress">問題 1 / 10</div>
+    <!-- 1. スタート画面（カテゴリ選択） -->
+    <div id="start-screen">
+      <p style="text-align: center; margin-bottom: 1.5rem;">挑戦するカテゴリを選択してください</p>
+      <div class="options">
+        <button class="option-btn" onclick="startQuiz('all')">全カテゴリ（ランダム）</button>
+        <button class="option-btn" onclick="startQuiz('html-css')">HTML / CSS編</button>
+        <button class="option-btn" onclick="startQuiz('js')">JavaScript編</button>
+        <button class="option-btn" onclick="startQuiz('git-infra')">Git / インフラ編</button>
+      </div>
+    </div>
+    
+    <!-- 2. クイズ画面（最初は非表示） -->
+    <div id="quiz-screen" style="display: none;">
+      <div class="progress" id="progress">問題 1 / 5</div>
       <div class="timer" id="timer">残り時間: 10秒</div>
       <div class="question" id="question">問題を読み込み中...</div>
       <div class="options" id="options"></div>
@@ -22,14 +32,13 @@
       <button id="next-btn" class="next-btn" style="display: none;">次の問題へ</button>
     </div>
 
-    <!-- ↓ ここを修正・追加します -->
+    <!-- 3. 結果画面（最初は非表示） -->
     <div id="result-screen" style="display: none;">
       <h2>結果発表</h2>
       <p class="score" id="score"></p>
-      <p class="high-score" id="high-score"></p> <!-- ← この行を追加 -->
+      <p class="high-score" id="high-score"></p>
       <button onclick="location.reload()" class="restart-btn">もう一度挑戦する</button>
     </div>
   </div>
 </body>
-
 </html>
