@@ -1,13 +1,17 @@
+const API_URL = "https://quiz-app-api.xin0428.workers.dev"; // 作成した Workers の URL
+
 let allQuizData = []; 
 let quizData = [];    
 let currentQuestion = 0;
 let score = 0;
+let currentUser = null; 
 
 let timerId = null;
 const TIME_LIMIT = 10;
 let timeLeft = TIME_LIMIT;
 
 // DOM要素
+const authScreen = document.getElementById("auth-screen");
 const startScreen = document.getElementById("start-screen");
 const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
@@ -19,45 +23,84 @@ const progressEl = document.getElementById("progress");
 const scoreEl = document.getElementById("score");
 const highScoreEl = document.getElementById("high-score");
 const timerEl = document.getElementById("timer");
+const authMessage = document.getElementById("auth-message");
+const userWelcome = document.getElementById("user-welcome");
 
-// 初回に全データを取得
-async function fetchQuizData() {
+// 新規会員登録処理（Workers API へ POST リクエスト）
+async function handleRegister() {
+  const email = document.getElementById("auth-email").value;
+  const password = document.getElementById("auth-password").value;
+
   try {
-    const response = await fetch("quiz-data.json");
-    if (!response.ok) {
-      throw new Error("データの取得に失敗しました");
+    const res = await fetch(`${API_URL}/api/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("登録が完了しました！ログインしてください。");
+      authMessage.textContent = "";
+    } else {
+      authMessage.textContent = data.error;
     }
-    allQuizData = await response.json();
-  } catch (error) {
-    console.error("エラー:", error);
-    alert("問題データの読み込みに失敗しました。");
+  } catch (err) {
+    authMessage.textContent = "通信エラーが発生しました";
   }
 }
 
-// カテゴリ選択後にクイズを開始する関数
-function startQuiz(selectedCategory) {
-  let filteredData = [];
+// ログイン処理（Workers API へ POST リクエスト）
+async function handleLogin() {
+  const email = document.getElementById("auth-email").value;
+  const password = document.getElementById("auth-password").value;
 
-  if (selectedCategory === "all") {
-    filteredData = allQuizData;
-  } else {
-    // 【重要】選ばれたカテゴリに一致する問題だけを抽出
-    filteredData = allQuizData.filter(q => q.category === selectedCategory);
+  try {
+    const res = await fetch(`${API_URL}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      currentUser = data.user;
+      userWelcome.textContent = `ログイン中: ${currentUser.email}`;
+      authScreen.style.display = "none";
+      startScreen.style.display = "block";
+    } else {
+      authMessage.textContent = data.error;
+    }
+  } catch (err) {
+    authMessage.textContent = "通信エラーが発生しました";
   }
+}
+
+// 初回データ取得
+async function fetchQuizData() {
+  try {
+    const response = await fetch("quiz-data.json");
+    if (!response.ok) throw new Error("データの取得に失敗しました");
+    allQuizData = await response.json();
+  } catch (error) {
+    console.error("エラー:", error);
+  }
+}
+
+function startQuiz(selectedCategory) {
+  let filteredData = (selectedCategory === "all") 
+    ? allQuizData 
+    : allQuizData.filter(q => q.category === selectedCategory);
 
   if (filteredData.length === 0) {
     alert("該当するカテゴリの問題がありません。");
     return;
   }
 
-  // シャッフルして抽出（最大3問または5問）
   quizData = getRandomQuestions(filteredData, Math.min(filteredData.length, 5));
-  
-  // 画面の切り替え
   startScreen.style.display = "none";
   quizScreen.style.display = "block";
 
-  // 変数の初期化と最初の問題読み込み
   currentQuestion = 0;
   score = 0;
   loadQuiz();
@@ -76,7 +119,6 @@ function startTimer() {
   timerId = setInterval(() => {
     timeLeft--;
     timerEl.textContent = `残り時間: ${timeLeft}秒`;
-
     if (timeLeft <= 0) {
       clearInterval(timerId);
       handleTimeOut();
@@ -109,23 +151,16 @@ function loadQuiz() {
 
 function selectOption(selectedIndex) {
   stopTimer();
-
   const current = quizData[currentQuestion];
   const buttons = optionsEl.querySelectorAll(".option-btn");
 
   buttons.forEach((button, index) => {
     button.disabled = true;
-    if (index === current.answer) {
-      button.classList.add("correct");
-    }
-    if (index === selectedIndex && index !== current.answer) {
-      button.classList.add("wrong");
-    }
+    if (index === current.answer) button.classList.add("correct");
+    if (index === selectedIndex && index !== current.answer) button.classList.add("wrong");
   });
 
-  if (selectedIndex === current.answer) {
-    score++;
-  }
+  if (selectedIndex === current.answer) score++;
 
   explanationEl.textContent = current.explanation;
   explanationEl.style.display = "block";
@@ -138,9 +173,7 @@ function handleTimeOut() {
 
   buttons.forEach((button, index) => {
     button.disabled = true;
-    if (index === current.answer) {
-      button.classList.add("correct");
-    }
+    if (index === current.answer) button.classList.add("correct");
   });
 
   explanationEl.textContent = `⏰ タイムオーバー！ ${current.explanation}`;
@@ -173,5 +206,4 @@ function showResult() {
   }
 }
 
-// アプリの起動時にデータだけ先読み
 fetchQuizData();
