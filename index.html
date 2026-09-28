@@ -11,8 +11,23 @@
   <div class="quiz-container">
     <h1>Web開発 基礎クイズ</h1>
 
-    <!-- 1. スタート画面（カテゴリ選択） -->
-    <div id="start-screen">
+    <!-- 認証エリア（新規登録・ログイン） -->
+    <div id="auth-screen">
+      <h2 id="auth-title">ログイン / 新規登録</h2>
+      <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1rem;">
+        <input type="email" id="auth-email" placeholder="メールアドレス" style="padding: 0.8rem; font-size: 1rem;">
+        <input type="password" id="auth-password" placeholder="パスワード" style="padding: 0.8rem; font-size: 1rem;">
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button onclick="handleLogin()" class="option-btn" style="flex: 1; text-align: center;">ログイン</button>
+        <button onclick="handleRegister()" class="option-btn" style="flex: 1; text-align: center; background: #e0f0ff;">新規登録</button>
+      </div>
+      <p id="auth-message" style="color: red; margin-top: 1rem; text-align: center;"></p>
+    </div>
+
+    <!-- スタート画面（ログイン成功まで非表示） -->
+    <div id="start-screen" style="display: none;">
+      <p id="user-welcome" style="text-align: center; font-weight: bold; margin-bottom: 1rem;"></p>
       <p style="text-align: center; margin-bottom: 1.5rem;">挑戦するカテゴリを選択してください</p>
       <div class="options">
         <button class="option-btn" onclick="startQuiz('all')">全カテゴリ（ランダム）</button>
@@ -22,7 +37,7 @@
       </div>
     </div>
     
-    <!-- 2. クイズ画面（最初は非表示） -->
+    <!-- クイズ画面 -->
     <div id="quiz-screen" style="display: none;">
       <div class="progress" id="progress">問題 1 / 5</div>
       <div class="timer" id="timer">残り時間: 10秒</div>
@@ -32,7 +47,7 @@
       <button id="next-btn" class="next-btn" style="display: none;">次の問題へ</button>
     </div>
 
-    <!-- 3. 結果画面（最初は非表示） -->
+    <!-- 結果画面 -->
     <div id="result-screen" style="display: none;">
       <h2>結果発表</h2>
       <p class="score" id="score"></p>
